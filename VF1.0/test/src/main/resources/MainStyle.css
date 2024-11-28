@@ -1,0 +1,88 @@
+/* STYLES FOR MAIN SCENE */
+
+/* Banner Style */
+.banner-main{
+    -fx-background-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+}
+
+/* Vbox Style */
+.vbox-main {
+    -fx-background-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-padding: 10px;
+}
+
+/* Default style for textboxes */
+.text-field-default {
+    -fx-font-family: "Sans-serif";
+    -fx-font-size: 20px;
+    -fx-background-color: White;
+    -fx-border-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-border-width: 2px;
+    -fx-prompt-text-fill: lightgrey;
+}
+
+/* Default button style */
+.button-default {
+    -fx-font-family: "Sans-serif";
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-border-color: White;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+/* Button style when clicked */
+.button-pressed {
+    -fx-font-family: "Sans-serif";
+    -fx-font-size: 20px;
+    -fx-text-fill: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-background-color: White;
+    -fx-border-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+/* Style for the listview */
+.list-view-default {
+    -fx-font-family: "Sans-serif";
+    -fx-font-size: 20px;
+    -fx-background-color: White;
+    -fx-border-color: linear-gradient(to bottom right,#7cb79b, #0d2b3d);
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-border-width: 2px;
+}
+
+/* Style for ListView cells */
+.list-view-default .cell {
+    -fx-background-color: White;
+    -fx-text-fill: Black;
+    -fix-font-family: "Sans-serif";
+    -fx-font-size: 20px;
+    -fx-padding: 10px;
+    -fx-border-color: lightgrey;
+    -fx-border-width: 1px;
+    -fx-background-radius: 3px;
+}
+
+/* Style for hovered cells */
+.list-view-default .cell:hover {
+    -fx-background-color: lightgrey;
+    -fx-text-fill: Black;
+}
+
+/* Style for selected cells */
+.list-view-default .cell:selected {
+    -fx-background-color: darkgrey;
+    -fx-text-fill: black;
+}
+
+/* Style for labels */
+.label-message {
+    -fx-text-fill: red;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
