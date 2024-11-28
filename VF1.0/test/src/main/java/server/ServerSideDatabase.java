@@ -20,7 +20,6 @@ public class ServerSideDatabase {
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = null;
 
-
         //Server Sockets
         ServerSocket serverSocket = null;
         serverSocket = new ServerSocket(1234);
