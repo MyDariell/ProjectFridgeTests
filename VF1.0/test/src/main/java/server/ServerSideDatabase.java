@@ -11,22 +11,21 @@ import java.util.stream.Collectors;
 
 public class ServerSideDatabase {
     private static final HashMap<String, Duration> expiryDate = new HashMap<>();
+    private String pathname;
+    private ServerSocket serverSocket;
 
-    public static void main(String[] args) throws IOException {
-        Socket socket = null;
-        InputStreamReader inputStreamReader = null;
-        OutputStreamWriter outputStreamWriter = null;
-        // Buffered Section improves efficiency by wrapping bytes / chars as a package and sending them
-        BufferedReader bufferedReader = null;
-        BufferedWriter bufferedWriter = null;
+    // Constructor to initialize the server
+    public ServerSideDatabase(String pathname, int port) throws IOException {
+        this.pathname = pathname;
+        this.serverSocket = new ServerSocket(port);
 
-        //Server Sockets
-        ServerSocket serverSocket = null;
-        serverSocket = new ServerSocket(1234);
+        // READ CSV and populate expiryDate map
+        readExpiryDatesFromFile();
+    }
 
-        //READ CSV
-        String filePath = "ItemExpiryDates/Food_ExpiryDates.txt";
-        try (BufferedReader parseBufferedReader = new BufferedReader(new FileReader(filePath))) {
+    // Read the expiry dates from the CSV file
+    private void readExpiryDatesFromFile() {
+        try (BufferedReader parseBufferedReader = new BufferedReader(new FileReader(pathname))) {
             String line;
             while ((line = parseBufferedReader.readLine()) != null) {
                 // Split the line using comma as the delimiter
@@ -45,12 +44,15 @@ public class ServerSideDatabase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    // Start accepting client connections
+    public void startServer() {
+        System.out.println("Server started. Waiting for clients...");
         while (true) {
             try {
-                socket = serverSocket.accept(); // Accept new client connection
+                Socket socket = serverSocket.accept(); // Accept new client connection
                 System.out.println("New client connected.");
-
 
                 // Create a new thread to handle the client
                 ClientSideThread clientHandler = new ClientSideThread(socket);
@@ -62,6 +64,7 @@ public class ServerSideDatabase {
         }
     }
 
+    // Static methods to access expiry date information
     protected static Duration getExpiryDate(String foodSearched) {
         return expiryDate.get(foodSearched);
     }
@@ -74,6 +77,18 @@ public class ServerSideDatabase {
         return (ArrayList<String>) expiryDate.keySet().stream()
             .filter(s -> s.contains(searchInput))
             .collect(Collectors.toList());
+    }
+
+    // Main method to run the server
+    public static void main(String[] args) {
+        try {
+            // Instantiate the Server with the file path and port
+            ServerSideDatabase server = new ServerSideDatabase("ItemExpiryDates/Food_ExpiryDates.txt", 1234);
+            // Start the server
+            server.startServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -121,7 +136,6 @@ class ClientSideThread implements Runnable {
                         }
                         bufferedWriter.newLine();
                         bufferedWriter.flush();
-
                     } catch (Exception e) {
                         e.printStackTrace();
                         bufferedWriter.write("Error processing SEARCH command.");
@@ -140,7 +154,6 @@ class ClientSideThread implements Runnable {
                 }
             }
 
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -152,6 +165,3 @@ class ClientSideThread implements Runnable {
         }
     }
 }
-
-
-

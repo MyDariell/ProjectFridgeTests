@@ -11,8 +11,6 @@ public class testMethods {
 
         ArrayList<String> searchResults = ClientSideApplication.getSearchResult("SAUSAGE");
 
-
-
         System.out.println(searchResults);
         System.out.println(ClientSideApplication.getSearchResult("PORK"));
         System.out.println("");
