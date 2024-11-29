@@ -1,6 +1,12 @@
 import client.ClientSideApplication;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.ServerSideDatabase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,10 +28,46 @@ FETA CHEESE, 40
 */
 public class SEARCHtest {
 
+    private Thread serverThread;
+
+    // Create and start the server before each test
+    @BeforeEach
+    public void setUp() {
+        serverThread = new Thread(() -> {
+            try {
+                createServer();
+            } catch (IOException e) {
+                System.err.println("Failed to initialize the server: " + e.getMessage());
+            }
+        });
+        serverThread.start();
+    }
+
+    // Stop the server after each test
+    @AfterEach
+    public void tearDown() {
+        stopServer();
+    }
+
+    public void createServer() throws IOException {
+        ServerSideDatabase testingServer = new ServerSideDatabase("src/test/testExpiryDates/TestFood_ExpiryDates.txt", 1234);
+        testingServer.startServer();
+        System.out.println("Server started successfully!");
+    }
+
+    public void stopServer() {
+        if (serverThread != null && serverThread.isAlive()) {
+            try {
+                serverThread.interrupt();
+            } catch (Exception e) {
+                System.err.println("Failed to stop the server: " + e.getMessage());
+            }
+        }
+    }
+
     @Test
     public void BlankInput(){
         ArrayList<String> Expected = new ArrayList<>();
-
         ArrayList<String> blank = ClientSideApplication.getSearchResult("");
         assertEquals(Expected, blank);
     }

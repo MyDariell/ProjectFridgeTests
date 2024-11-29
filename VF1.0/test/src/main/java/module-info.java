@@ -7,4 +7,5 @@ module com.example.test {
     opens virtual.fridge.test to javafx.fxml;
     exports virtual.fridge.test;
     exports client;
+    exports server;
 }

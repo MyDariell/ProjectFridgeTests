@@ -1,7 +1,7 @@
 import server.ServerSideDatabase;
 import java.io.IOException;
 
-//RUN THIS TO START THE TEST SERVER FOR TESTING
+//we can delete
 
 public class ClientSideApplicationTest {
     public static void main(String[] args) {
@@ -12,6 +12,5 @@ public class ClientSideApplicationTest {
         } catch (IOException e) {
             System.err.println("Failed to initialize the server: " + e.getMessage());
         }
-
     }
 }
