@@ -45,7 +45,7 @@ public class ClientSideApplication {
 
     public static ArrayList<String> getSearchResult(String searchInput) {
         try {
-            String modifiedInput = searchInput.replaceAll("\s","");
+            String modifiedInput = searchInput.replaceFirst("^\\s+","");
             modifiedInput = modifiedInput.toUpperCase();
             bufferedWriter.write("SEARCH " + modifiedInput);
             bufferedWriter.newLine();

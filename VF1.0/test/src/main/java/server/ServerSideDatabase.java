@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class ServerSideDatabase {
     private static final HashMap<String, Duration> expiryDate = new HashMap<>();
+    private static final ArrayList<String> allFoods = new ArrayList<>();
     private String pathname;
     private ServerSocket serverSocket;
 
@@ -37,6 +38,7 @@ public class ServerSideDatabase {
                     int days = Integer.parseInt(parts[1].trim());
                     // Add the entry to the HashMap
                     expiryDate.put(key, Duration.ofDays(days));
+                    allFoods.add(key);
                 } else {
                     System.out.println("Invalid line format: " + line);
                 }
@@ -74,9 +76,13 @@ public class ServerSideDatabase {
     }
 
     protected static ArrayList<String> getSearchResult(String searchInput) {
-        return (ArrayList<String>) expiryDate.keySet().stream()
-            .filter(s -> s.contains(searchInput))
-            .collect(Collectors.toList());
+        ArrayList<String> result = new ArrayList<>();
+        for (String allFood : allFoods) {
+            if (allFood.contains(searchInput)) {
+                result.add(allFood);
+            }
+        }
+        return result;
     }
 
     // Main method to run the server
@@ -125,7 +131,12 @@ class ClientSideThread implements Runnable {
                     bufferedWriter.flush();
                 } else if (msgFromClient.startsWith("SEARCH")) {
                     String searchValue = msgFromClient.substring(7);
-                    ArrayList<String> indexedSearch = ServerSideDatabase.getSearchResult(searchValue);
+                    ArrayList<String> indexedSearch;
+                    if (searchValue.isEmpty()){
+                        continue;
+                    } else {
+                        indexedSearch = ServerSideDatabase.getSearchResult(searchValue);
+                    }
                     String delimiter = ";";
                     try {
                         if (indexedSearch.isEmpty()) {
