@@ -17,7 +17,7 @@ public class FridgeModel {
     private static final long THREAD_SLEEP_MILLIS = 1000;
     private HashMap<String, LocalDate> clientFridge;
     private HashMap<String, Boolean> foodExpired;
-    private HashMap<String, Long> foodDaysLeft;
+    private HashMap<String, Integer> foodDaysLeft;
     private LocalDate today = LocalDate.now();
     private String clientFridgePath = "src/ClientFridge.txt";
     private ClockThread clockThread;
@@ -57,7 +57,7 @@ public class FridgeModel {
         }
         clientFridge.put(food.getItemName(), food.getExpiryDate());
         foodExpired.put(food.getItemName(), false);
-        foodDaysLeft.put(food.getItemName(), ChronoUnit.DAYS.between(food.getExpiryDate(),today));
+        foodDaysLeft.put(food.getItemName(), (int) ChronoUnit.DAYS.between(food.getExpiryDate(),today));
     }
 
     /**
@@ -110,13 +110,19 @@ public class FridgeModel {
     }
 
     /**
-     * Utility Method: Updates the days left of each item in the fridge. If an item is pass its expiry date, it will replace the value
-     * with a negative value of how many days they've gone over the expiry date.
+     * Method: Updates the days left of each item in the fridge. (today - expiryDate)
+     * If an item is pass its expiry date, it will stay at 0.
+     *
      */
-    private void updateDaysLeft () {
+    public void updateDaysLeft () {
         for (String food : clientFridge.keySet()) {
-            long daysLeft = ChronoUnit.DAYS.between(clientFridge.get(food), today);
-            foodDaysLeft.put(food, daysLeft);
+            int daysLeft = (int) ChronoUnit.DAYS.between(clientFridge.get(food), today);
+            if (daysLeft < 0) {
+                foodDaysLeft.put(food, 0);
+            }
+            else {
+                foodDaysLeft.put(food, daysLeft);
+            }
             }
         }
 
@@ -141,10 +147,16 @@ public class FridgeModel {
 
     /**
      * Method: Returns the days left of each item in the fridge.
+     * returns -1 if food does not exist in the fridge.
      * @return
      */
-    public HashMap<String, Long> getFoodDaysLeft() {
-        return new HashMap<>(foodDaysLeft);
+    public int getFoodDaysLeft(String itemName) {
+        if (hasItem(itemName)) {
+            return foodDaysLeft.get(itemName);
+        }
+        else {
+            return -1;
+        }
     }
 
     /**

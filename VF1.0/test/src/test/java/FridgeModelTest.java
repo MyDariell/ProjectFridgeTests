@@ -37,7 +37,6 @@ public class FridgeModelTest {
         assertEquals(expectedFridge, clientFridge.getClientFridge());
     }
 
-
     @Test
     public void removeItem () {
         createFridge();
@@ -46,7 +45,6 @@ public class FridgeModelTest {
         clientFridge.removeFromFridge("Banana");
         assertEquals(expectedFridge, clientFridge.getClientFridge());
     }
-
 
     @Test
     public void checkExpiry () {
@@ -59,6 +57,23 @@ public class FridgeModelTest {
         expectedFoodExpired.put ("Banana", false);
         assertEquals(expectedFoodExpired, clientFridge.getExpiredFood());
     }
+
+    @Test
+    public void checkDaysLeft () {
+        createFridge();
+        clientFridge.setCurrentDate(LocalDate.of(2024,11,26));
+        clientFridge.checkExpiry();
+        clientFridge.updateDaysLeft();
+
+        HashMap<String, Boolean> expectedFoodExpired = new HashMap<>();
+        expectedFoodExpired.put ("Apple", true);
+        expectedFoodExpired.put ("Banana", false);
+        assertEquals(2, clientFridge.getFoodDaysLeft("Apple"));
+        assertEquals(0, clientFridge.getFoodDaysLeft("Banana"));
+
+    }
+
+
 
 
     //HELPER METHODS
