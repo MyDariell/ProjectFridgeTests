@@ -3,6 +3,7 @@ package client;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,57 +14,91 @@ import java.util.Map;
  */
 
 public class FridgeModel {
+    private static final long THREAD_SLEEP_MILLIS = 1000;
     private HashMap<String, LocalDate> clientFridge;
     private HashMap<String, Boolean> foodExpired;
+    private HashMap<String, Long> foodDaysLeft;
     private LocalDate today = LocalDate.now();
     private String clientFridgePath = "src/ClientFridge.txt";
+    private ClockThread clockThread;
 
+    /**
+     * Constructor to create a Fridge
+     */
     public FridgeModel() {
         this.clientFridge = new HashMap<>();
         this.foodExpired = new HashMap<>();
+        this.foodDaysLeft = new HashMap<>();
         loadCSV();
-        ClockThread thread = new ClockThread();
-        thread.start();
+        ClockThread clockThread = new ClockThread();
+        clockThread.start();
 
     }
-
+    /**
+     * Constructor to create a Fridge
+     */
     public FridgeModel(LocalDate startingDate, String path) {
         this.today = startingDate;
         this.clientFridge = new HashMap<>();
         this.clientFridgePath = path;
         this.foodExpired = new HashMap<>();
+        this.foodDaysLeft = new HashMap<>();
+        ClockThread clockThread = new ClockThread();
         loadCSV();
     }
 
+    /**
+     * Method: Adds a food item to the fridge
+     * @param food
+     */
     public void addToFridge(Food food) {
+        if (food == null) {
+            throw new IllegalArgumentException();
+        }
         clientFridge.put(food.getItemName(), food.getExpiryDate());
         foodExpired.put(food.getItemName(), false);
-    }
-
-    public boolean hasItem(Food food) {
-        return clientFridge.entrySet().stream()
-            .anyMatch(entry -> entry.getKey().equals(food.getItemName()) && entry.getValue() == food.getExpiryDate());
+        foodDaysLeft.put(food.getItemName(), ChronoUnit.DAYS.between(food.getExpiryDate(),today));
     }
 
     /**
-     * Returns true if food is successfully removed from the fridge. False otherwise.
-     *
+     * Method: Checks if a food item exists in the fridge
      * @param food
      * @return
      */
-    public boolean removeFromFridge(Food food) {
-        if (hasItem(food)) {
-            clientFridge.remove(food.getItemName());
-            foodExpired.remove(food.getItemName());
+    public boolean hasItem(Food food) {
+        return clientFridge.entrySet().stream()
+            .anyMatch(entry -> entry.getKey().equals(food.getItemName()));
+    }
+
+    /**
+     * Method: Checks if a food item exists in the fridge
+     * @param foodName
+     * @return
+     */
+    public boolean hasItem(String foodName) {
+        return clientFridge.keySet().stream()
+            .anyMatch(name -> name.equals(foodName));
+    }
+
+    /**
+     * Method: Removes a food item from the fridge.
+     * Returns true if food is successfully removed from the fridge. False otherwise.
+     * @param itemName
+     * @return
+     */
+    public boolean removeFromFridge(String itemName) {
+        if (hasItem(itemName)){
+            clientFridge.remove(itemName);
+            foodExpired.remove(itemName);
+            foodDaysLeft.remove(itemName);
             return true;
         }
         return false;
     }
 
     /**
-     * Checks all Item in the fridge, whether they have expired.
+     * Method: Checks all items in the fridge, whether they have expired.
      * returns true if at least more than one item has expired and been set to expired.
-     *
      * @return
      */
     public void checkExpiry() {
@@ -74,10 +109,22 @@ public class FridgeModel {
         }
     }
 
+    /**
+     * Utility Method: Updates the days left of each item in the fridge. If an item is pass its expiry date, it will replace the value
+     * with a negative value of how many days they've gone over the expiry date.
+     */
+    private void updateDaysLeft () {
+        for (String food : clientFridge.keySet()) {
+            long daysLeft = ChronoUnit.DAYS.between(clientFridge.get(food), today);
+            foodDaysLeft.put(food, daysLeft);
+            }
+        }
+
+
     //GETTERS------------------------------------------------------------------------------------------------
 
     /**
-     * Gets a Map of all the food in the Fridge mapped to whether they are expired or not.
+     * Method: Gets a Map of all the food in the Fridge mapped to whether they are expired or not.
      * @return
      */
     public HashMap<String, Boolean> getExpiredFood() {
@@ -85,7 +132,7 @@ public class FridgeModel {
     }
 
     /**
-     * Returns a Map of the client's fridge and the item's expiry date
+     * Method: Returns a Map of the client's fridge and the item's expiry date
      * @return
      */
     public HashMap<String, LocalDate> getClientFridge() {
@@ -93,12 +140,19 @@ public class FridgeModel {
     }
 
     /**
-     * Updates the current Date to the System Date
+     * Method: Returns the days left of each item in the fridge.
+     * @return
      */
-    public void updateCurrentDate() {
-        this.today = LocalDate.now();
+    public HashMap<String, Long> getFoodDaysLeft() {
+        return new HashMap<>(foodDaysLeft);
     }
 
+    /**
+     * Helper Method: Updates the current Date of the fridge to the System Date
+     */
+    private void updateCurrentDate() {
+        this.today = LocalDate.now();
+    }
 
     /**
      * Manual override of current date
@@ -109,13 +163,30 @@ public class FridgeModel {
     public void setCurrentDate(LocalDate date) {
         this.today = date;
     }
-    public void loadPath(String path) {
-        clientFridgePath = path;
-    }
+
+    /**
+     * Method: Logic to shut the fridge down
+     */
+    public void shutDownFridge() {
+            if (clockThread != null) {
+                clockThread.stopThread();
+                try {
+                    clockThread.join();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            writeCSV();
+        }
+
 
 
     //WRITE AND LOADING CSV------------------------------------------------------------------------------------------
-    public void writeCSV() {
+
+    /**
+     * Utility Method: Writes to csv file the HashMap of clientFridge.
+     */
+    private void writeCSV() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/ClientFridge.txt"))) {
             for (Map.Entry<String, LocalDate> entry : clientFridge.entrySet()) {
                 String line = entry.getKey() + "," + entry.getValue().toString();
@@ -127,7 +198,10 @@ public class FridgeModel {
         }
     }
 
-    public void loadCSV() {
+    /**
+     * Utility Method: Loads csv from the file to the clientFridge HashMap.
+     */
+    private void loadCSV() {
         try (BufferedReader reader = new BufferedReader(new FileReader(clientFridgePath
         ))) {
             String line;
@@ -144,22 +218,44 @@ public class FridgeModel {
         }
     }
 
+
+
     /**
-     * Thread that continously updates the currentDate whenever client is up and checks the expiry date of the fridge.
+     * Class:
+     * Thread class that continously updates the currentDate, checkExpiry and updateDaysLeft whenever the client
+     * application is up and the FridgeModel instance is created
      */
     class ClockThread extends Thread {
+        private boolean running = true;
+
         public void run() {
-            while (true) {
-                updateCurrentDate();
-                checkExpiry();
+            while (running) {
+                synchronized (FridgeModel.this) {
+                    updateCurrentDate();
+                    checkExpiry();
+                    updateDaysLeft();
+                }
                 try {
-                    sleep(300);
+                    Thread.sleep(THREAD_SLEEP_MILLIS);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    // Handle interruption gracefully
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }
+
+        /**
+         * Method: Stops the thread
+         */
+        public void stopThread() {
+            running = false;
+        }
     }
 }
+
+
+
+
 
 

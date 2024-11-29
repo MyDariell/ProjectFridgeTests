@@ -1,10 +1,13 @@
 import client.ClientSideApplication;
+import client.Food;
+import client.FridgeModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ServerSideDatabase;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -197,6 +200,11 @@ public class TestServerAndCommand {
         int expiryDate = ClientSideApplication.getExpiryDate("APPLE");
 
         assertEquals(5, expiryDate);
+    }
+
+    @Test
+    public void createFridge () {
+
     }
 
 }

@@ -29,9 +29,7 @@ public class FridgeModelTest {
     }
     @Test
     public void testAddItem () {
-
         createFridge();
-
         HashMap<String, LocalDate> expectedFridge = new HashMap<>();
         expectedFridge.put("Apple", LocalDate.of(2024,11,24));
         expectedFridge.put("Banana", LocalDate.of(2024,11,26));
@@ -39,14 +37,16 @@ public class FridgeModelTest {
         assertEquals(expectedFridge, clientFridge.getClientFridge());
     }
 
+
     @Test
     public void removeItem () {
         createFridge();
         HashMap<String, LocalDate> expectedFridge = new HashMap<>();
         expectedFridge.put("Apple", LocalDate.of(2024,11,24));
-        clientFridge.removeFromFridge(item2);
+        clientFridge.removeFromFridge("Banana");
         assertEquals(expectedFridge, clientFridge.getClientFridge());
     }
+
 
     @Test
     public void checkExpiry () {
@@ -60,18 +60,6 @@ public class FridgeModelTest {
         assertEquals(expectedFoodExpired, clientFridge.getExpiredFood());
     }
 
-
-    @Test
-    public void writeToCsv (){
-        createFridge();
-        clientFridge.writeCSV();
-    }
-
-    //TODO: Potential problem, duplicate food in the fridge (same itemName and expiryDate
-
-    @Test
-    public void removeItemDuplicate () {
-    }
 
     //HELPER METHODS
 
