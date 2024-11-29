@@ -131,10 +131,8 @@ class ClientSideThread implements Runnable {
                     bufferedWriter.flush();
                 } else if (msgFromClient.startsWith("SEARCH")) {
                     String searchValue = msgFromClient.substring(7);
-                    ArrayList<String> indexedSearch;
-                    if (searchValue.isEmpty()){
-                        continue;
-                    } else {
+                    ArrayList<String> indexedSearch = new ArrayList<>();
+                    if (!searchValue.isEmpty()){
                         indexedSearch = ServerSideDatabase.getSearchResult(searchValue);
                     }
                     String delimiter = ";";
