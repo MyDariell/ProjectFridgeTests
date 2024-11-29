@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,6 +30,33 @@ public class FridgeModelTest {
         clientFridge.addToFridge(item2);
         this.clientFridge = clientFridge;
     }
+
+    @Test
+    public void loadingFridge () {
+        FridgeModel clientFridge = new FridgeModel(currentDate,"src/test/testFridges/fridge1.txt");
+
+        Set<String> actualClientFridge = new HashSet<>(clientFridge.getClientFridge().keySet());
+        HashSet<String> expectedClientFridge = new HashSet<>();
+        expectedClientFridge.add("Corn");
+        expectedClientFridge.add("Banana");
+        expectedClientFridge.add("Steak");
+        expectedClientFridge.add("Meatball");
+        expectedClientFridge.add("Chicken Thigh");
+
+        assertEquals(expectedClientFridge,actualClientFridge);
+    }
+
+    @Test
+    public void loadExpiryDateFridge () {
+        FridgeModel clientFridge = new FridgeModel(currentDate,"src/test/testFridges/fridge1.txt");
+
+        LocalDate expectedCorn = LocalDate.parse("2024-11-26");
+        LocalDate expectedBanana = LocalDate.parse("2024-11-30");
+        assertEquals(expectedCorn,clientFridge.getClientFridge().get("Corn"));
+        assertEquals(expectedBanana,clientFridge.getClientFridge().get("Banana"));
+    }
+
+
     @Test
     public void testAddItem () {
         createFridge();
@@ -75,7 +105,6 @@ public class FridgeModelTest {
 
 
 
-
     //HELPER METHODS
 
     public static boolean clearFile(String filePath) {
@@ -86,6 +115,19 @@ public class FridgeModelTest {
             return false;
         }
     }
+
+//    @Test
+//    public void newFridge () {
+//        FridgeModel fridge = new FridgeModel();
+//        this.item2 = new Food ("HUMANLEG", Duration.ofDays(5), currentDate);
+//        fridge.addToFridge(item2);
+//        for (String s :fridge.getClientFridge().keySet()) {
+//            System.out.println(s);
+//        };
+//        System.out.println(fridge.getExpiredFood());
+//        fridge.shutDownFridge();
+//        clearFile("src/ClientFridge.txt");
+//    }
 
 
 }

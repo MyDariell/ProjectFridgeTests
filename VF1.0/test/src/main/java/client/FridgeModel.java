@@ -30,9 +30,10 @@ public class FridgeModel {
         this.foodExpired = new HashMap<>();
         this.foodDaysLeft = new HashMap<>();
         loadCSV();
+        checkExpiry();
+        updateDaysLeft();
         ClockThread clockThread = new ClockThread();
         clockThread.start();
-
     }
     /**
      * Constructor to create a Fridge
@@ -105,6 +106,9 @@ public class FridgeModel {
         for (String food : clientFridge.keySet()) {
             if (today.isAfter(clientFridge.get(food))) {
                 foodExpired.put(food, true);
+            }
+            else {
+                foodExpired.put(food,false);
             }
         }
     }
@@ -241,11 +245,13 @@ public class FridgeModel {
         private boolean running = true;
 
         public void run() {
+
             while (running) {
                 synchronized (FridgeModel.this) {
                     updateCurrentDate();
                     checkExpiry();
                     updateDaysLeft();
+                    System.out.println("Thread Alive");
                 }
                 try {
                     Thread.sleep(THREAD_SLEEP_MILLIS);
