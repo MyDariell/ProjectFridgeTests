@@ -1,6 +1,4 @@
 import client.ClientSideApplication;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /*
 
@@ -26,7 +25,7 @@ ASIAN SAUSAGE, 1
 FETA CHEESE, 40
 
 */
-public class SEARCHtest {
+public class TestServerAndCommand {
 
     private Thread serverThread;
 
@@ -154,7 +153,7 @@ public class SEARCHtest {
     }
 
     @Test
-    public void PORKRAW () {
+    public void PorkRaw() {
         ArrayList<String> Expected = new ArrayList<>();
         Expected.add("PORK RAW");
 
@@ -162,5 +161,49 @@ public class SEARCHtest {
 
         assertEquals(Expected, uppercase);
     }
+    /*
+
+    These are the tests for GET command
+
+     */
+
+    @Test
+    public void InvalidInput1() {
+
+        int expiryDate = ClientSideApplication.getExpiryDate("CPEN211");
+
+        assertEquals(-1, expiryDate);
+    }
+
+    @Test
+    public void InvalidInput2() {
+
+        int expiryDate = ClientSideApplication.getExpiryDate("PORKRAW");
+
+        assertEquals(-1, expiryDate);
+    }
+
+    @Test
+    public void PorkRawDate() {
+
+        int expiryDate = ClientSideApplication.getExpiryDate("PORK RAW");
+
+        assertEquals(35, expiryDate);
+    }
+
+    @Test
+    public void AppleDate() {
+
+        int expiryDate = ClientSideApplication.getExpiryDate("APPLE");
+
+        assertEquals(5, expiryDate);
+    }
 
 }
+
+
+
+
+
+
+
